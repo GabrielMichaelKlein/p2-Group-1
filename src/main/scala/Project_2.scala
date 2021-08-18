@@ -36,20 +36,10 @@ object Project_2 {
     percentConfirmedTable.show(60)
   }
 
-  def main(args:Array[String]): Unit = {
-    val spark = SparkSession
-      .builder
-      .appName("p3")
-      .config("spark.master", "local")
-      .config("spark.sql.catalogImplementation","hive")
-      .config("hive.exec.dynamic.partition.mode", "nonstrict")
-      .enableHiveSupport()
-      .getOrCreate()
+  def covid_US_Trends(spark:SparkSession): Unit = {
     spark.sparkContext.setLogLevel("WARN")
     val sc = spark.sparkContext
     import spark.implicits._
-    var userInput = readLine("Do you want to run Grant's part (y/n)")
-    if(userInput == "y"){grantsPart(spark)}
 
     val covid_data_DF = spark.read.format("csv").option("header", true).load("input/covid_19_data.csv")
 
@@ -82,5 +72,20 @@ object Project_2 {
     } catch {
       case _: Throwable => println("EXCEPTION FOUND: FILE ALREADY EXISTS!")
     }
+  }
+
+
+  def main(args:Array[String]): Unit = {
+    val spark = SparkSession
+      .builder
+      .appName("p3")
+      .config("spark.master", "local")
+      .config("spark.sql.catalogImplementation", "hive")
+      .config("hive.exec.dynamic.partition.mode", "nonstrict")
+      .enableHiveSupport()
+      .getOrCreate()
+    spark.sparkContext.setLogLevel("WARN")
+    grantsPart(spark)
+    covid_US_Trends(spark)
   }
 }
