@@ -9,6 +9,15 @@ import java.util.Date
 object Project_2 {
   case class Entry(entryno: Int, ObservationDate: String, Province_State: String, Country_Region: String, Last_Updated: String, Confirmed: Int, Deaths: Int, Recovered: Int)
   def main(args:Array[String]): Unit = {
+    covid_US_Trends()
+  }
+
+  def covid_US_Trends(): Unit = {
+    /*
+    This method loads data from covid_19_data.csv, filters the data to only show data from the united states using
+    Spark SQL, cleans up the data, and creates a new csv file that can easily be exported to Excel to create
+    line graphs showing Covid Deaths over time in each state and Covid Infections over time in each state.
+     */
     val spark = SparkSession
       .builder
       .appName("p3")
@@ -30,28 +39,32 @@ object Project_2 {
     covid_US_DF_clean = covid_US_DF_clean.withColumn("Deaths_Int", covid_US_DF_clean("Deaths").cast(IntegerType)).drop("Deaths")
     covid_US_DF_clean.createOrReplaceTempView("covid_US")
     val df1 = spark.sql("SELECT `Province/State` AS State, MAX(Deaths_INT) AS deaths FROM covid_US WHERE `Province/State` NOT LIKE '%,%' GROUP BY `Province/State` HAVING deaths>50")
-    df1.show(200)
-    df1.describe().show()
 
-    val rdd1 = sc.parallelize(Seq("Alabama", "Alaska", "Arizona", "Arkansas", "California" ,"" +
+    val states = Seq("Alabama", "Alaska", "Arizona", "Arkansas", "California" ,"" +
       "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "" +
       "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "" +
       "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "" +
       "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "" +
       "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "" +
-      "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "District of Columbia"))
+      "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "District of Columbia")
+
+    val rdd1 = sc.parallelize(states)
 
     val states_DF = rdd1.toDF("States")
-    states_DF.show()
+    //states_DF.show()
+
     val records = states_DF.join(covid_US_DF_clean, col("Province/State") === col("States"))
     records.createOrReplaceTempView("records")
     val final_DF = spark.sql("SELECT States, Date, CAST(Confirmed AS INT), Deaths_Int AS Deaths FROM records")
-
+    //final_DF.show()
+    final_DF.createOrReplaceTempView("tempT")
     try {
       final_DF.write.format("com.databricks.spark.csv").save("covid_us_final.csv")
+
 
     } catch {
       case _: Throwable => println("EXCEPTION FOUND: FILE ALREADY EXISTS!")
     }
   }
+
 }
