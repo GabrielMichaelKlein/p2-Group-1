@@ -2,9 +2,10 @@ import org.apache.hadoop.fs.FileAlreadyExistsException
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark._
-import org.apache.spark.sql.functions.{col, sum, to_date, to_timestamp}
+import org.apache.spark.sql.functions.{col, lit, round, sum, to_date, to_timestamp}
 
 import java.util.Date
+import scala.Console.println
 
 object Project_2 {
   case class Entry(entryno: Int, ObservationDate: String, Province_State: String, Country_Region: String, Last_Updated: String, Confirmed: Int, Deaths: Int, Recovered: Int)
@@ -74,6 +75,74 @@ object Project_2 {
     }
   }
 
+  def covid_Global_Trends(spark:SparkSession): Unit = {
+    val casesDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_confirmed.csv")
+    val deathsDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_deaths.csv")
+
+    val deathsQuarterlyUngroupedDF = deathsDF.select(col("Country/Region"),col("2/2/20").as("D 2/20"), col("5/2/20").as("D 5/20"),col("8/2/20").as("D 8/20"), col("11/2/20").as("D 11/20"), col("2/20/21").as("D 2/21"),col("5/2/21").as("D 5/21"))
+    val deathsByCountryDF = deathsQuarterlyUngroupedDF
+      .groupBy("Country/Region")//.sum("D 5/21")
+      .agg(sum("D 2/20"), sum("D 5/20"), sum ("D 8/20"), sum("D 11/20"), sum("D 2/21"), sum("D 5/21"))
+      .orderBy(col("sum(D 5/21)").desc)
+
+    val casesQuarterlyUngroupedDF = casesDF.select(col("Country/Region"),col("2/2/20").as("C 2/20"), col("5/2/20").as("C 5/20"),col("8/2/20").as("C 8/20"), col("11/2/20").as("C 11/20"), col("2/20/21").as("C 2/21"),col("5/2/21").as("C 5/21"))
+    var casesByCountryDF = casesQuarterlyUngroupedDF
+      .groupBy("Country/Region")//.sum("C 5/21")
+      .agg(sum ("C 2/20"), sum("C 5/20"), sum ("C 8/20"), sum("C 11/20"), sum("C 2/21"), sum("C 5/21"))
+      .orderBy(col("sum(C 5/21)").desc)
+
+    casesByCountryDF = casesByCountryDF.withColumnRenamed("Country/Region", "Country")
+
+    val joinedData =  deathsByCountryDF
+      .join(casesByCountryDF, deathsByCountryDF("Country/Region") === casesByCountryDF("Country"))
+      .drop("Country/Region")
+      .persist
+
+    val deathCaseRatio = joinedData
+      .select("Country", "sum(C 5/21)", "sum(D 5/21)")
+      .withColumn("Death_Case_Ratio", round(col("sum(D 5/21)")/col("sum(C 5/21)") * 100, 2))
+      .orderBy(col("Death_Case_Ratio").desc)
+
+    val renamed = joinedData.withColumnRenamed("sum(D 5/21)", "Deaths_May2021").withColumnRenamed("sum(C 5/21)", "Cases_May2021")
+    renamed.createOrReplaceTempView("joined_Data")
+
+    val globalRatioDF = spark.sql("Select sum(Cases_May2021) as Cases_May2021, sum(Deaths_May2021) as Deaths_May2021, round(sum(Deaths_May2021)/sum(Cases_May2021), 2) * 100 as Death_Case_Ratio from joined_Data")
+    val withCountry = globalRatioDF.withColumn("Country", lit("Global"))
+
+    val deathCaseRatioFinalDF = withCountry.select("Country","Cases_May2021", "Deaths_May2021", "Death_Case_Ratio")
+      .union(deathCaseRatio.select("Country", "sum(C 5/21)", "sum(D 5/21)", "Death_Case_Ratio"))
+      .orderBy(col("Death_Case_Ratio").desc)
+
+    //Print trends
+    println("\nCases by Country: 5/2/20 to 5/2/21")
+    casesByCountryDF.show
+
+    println("\nDeaths by Country: 5/2/20 to 5/2/21")
+    deathsByCountryDF.show
+
+    println("\nDeath_Case_Ratios: 5/2/21")
+    deathCaseRatioFinalDF.show
+
+    println("\nGlobal vs US Rates as of 5/2/21: ")
+    deathCaseRatioFinalDF.select("Country","Cases_May2021", "Deaths_May2021", "Death_Case_Ratio")
+      .where(deathCaseRatioFinalDF("Country") === "US" || deathCaseRatioFinalDF("Country") === "Global").show
+
+    //Compile to one visualizationDF for .csv export
+    val tempRatioDF = deathCaseRatioFinalDF.withColumnRenamed("Country","C2")
+    val visualizationDF = joinedData.join(tempRatioDF.select("C2","Death_Case_Ratio"), tempRatioDF("C2") === joinedData("Country")).drop("C2")
+    //visualizationDF.show
+
+    try {
+      visualizationDF.coalesce(1).write
+        .option("header","true")
+        .format("com.databricks.spark.csv")
+        .save("visualization.csv")
+    }
+    catch {
+      case _: Throwable => println("EXCEPTION FOUND: FILE ALREADY EXISTS!")
+    }
+  }
+
 
   def main(args:Array[String]): Unit = {
     val spark = SparkSession
@@ -87,5 +156,6 @@ object Project_2 {
     spark.sparkContext.setLogLevel("WARN")
     grantsPart(spark)
     covid_US_Trends(spark)
+    covid_Global_Trends(spark)
   }
 }
