@@ -1,11 +1,11 @@
 ----------------------------------------------------------------
-Mon Aug 16 09:32:24 MST 2021:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-017b-4fce-9612-000007dec8e8 
-on database directory C:\Users\gaber\Desktop\Revature Items\p2\metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@102ecc22 
-Loaded from file:/C:/Users/gaber/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
-java.vendor=Oracle Corporation
-java.runtime.version=1.8.0_261-b12
-user.dir=C:\Users\gaber\Desktop\Revature Items\p2
+Wed Aug 18 11:51:56 EDT 2021:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-017b-59f6-433f-000019e89bc8 
+on database directory C:\p2-Group-1\metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@43e9089 
+Loaded from file:/C:/Users/grant/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=AdoptOpenJDK
+java.runtime.version=1.8.0_292-b10
+user.dir=C:\p2-Group-1
 os.name=Windows 10
 os.arch=amd64
 os.version=10.0
