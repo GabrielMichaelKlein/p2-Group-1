@@ -11,7 +11,7 @@ import org.apache.hadoop.fs.FileAlreadyExistsException
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark._
-import org.apache.spark.sql.functions.{col, lit, round, sum, to_date, to_timestamp}
+import org.apache.spark.sql.functions.{asc, col, desc, lit, round, sum, to_date, to_timestamp}
 
 import java.util.Date
 import scala.Console.println
@@ -52,6 +52,15 @@ object Project_2 {
       case _: Throwable => println("EXCEPTION FOUND: FILE ALREADY EXISTS!")
     }
     percentConfirmedTable.show(60)
+    /* Extra Queries
+    percentConfirmedTable.select("state","confirmedOverPop").orderBy(desc("confirmedOverPop")).limit(1).show
+    percentConfirmedTable.select("state","deathsOverPop").orderBy(desc("deathsOverPop")).limit(1).show
+    percentConfirmedTable.select("state","deathsOverConfirmed").where("totalConfirmed > 5000").orderBy(desc("deathsOverConfirmed")).limit(1).show
+
+    percentConfirmedTable.select("state","confirmedOverPop").where("totalConfirmed > 5000").orderBy(asc("confirmedOverPop")).limit(1).show
+    percentConfirmedTable.select("state","deathsOverPop").where("totalConfirmed > 5000").orderBy(asc("deathsOverPop")).limit(1).show
+    percentConfirmedTable.select("state","deathsOverConfirmed").where("totalConfirmed > 5000").orderBy(asc("deathsOverConfirmed")).limit(1).show
+    */
   }
 
   def covid_US_Trends(spark:SparkSession): Unit = {
