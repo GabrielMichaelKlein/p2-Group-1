@@ -23,6 +23,11 @@ object Project_2 {
   case class Region2(UID : String, iso2 : String, iso3 : String, code3 : String, FIPS : String, Admin2 : String, Province : String, Country_Region : String, Lat : String, Long_ : String, Population : Int, Deaths : Int)
 
   def grantsPart(spark:SparkSession): Unit ={
+    /*
+    This method searches through time_series_covid_19_confirmed_US.csv and time_series_covid_19_deaths_USnew.csv,
+    relates the cases and deaths due to covid to the population of each state, and creates a new csv file
+    which can be imported into excel to create a bar chart showing the trends from each state.
+     */
     println("Running Grant's Part")
     import spark.implicits._
     println("generating dataframes")
@@ -97,6 +102,11 @@ object Project_2 {
   }
 
   def covid_Global_Trends(spark:SparkSession): Unit = {
+    /*
+    This method searches through time_series_covid_19_confirmed_US.csv and time_series_covid_19_deaths_USnew.csv,
+    relates the cases and deaths due to covid to the population of each state, and creates a new csv file
+    which can be imported into excel to create a bar chart showing the trends from each state.
+     */
     val casesDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_confirmed.csv")
     val deathsDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_deaths.csv")
 
