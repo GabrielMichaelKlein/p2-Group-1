@@ -113,8 +113,8 @@ object Project_2 {
   def covid_Global_Trends(spark:SparkSession): Unit = {
     /*
     This method searches through time_series_covid_19_confirmed_US.csv and time_series_covid_19_deaths_USnew.csv,
-    relates the cases and deaths due to covid to the population of each state, and creates a new csv file
-    which can be imported into excel to create a bar chart showing the trends from each state.
+    looks at the cases and deaths of every country, and creates a csv with cleaned up and filtered data which
+    can be used by Excel to create graphs to visualize the deaths per infection in different countries.
      */
     val casesDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_confirmed.csv")
     val deathsDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_deaths.csv")
