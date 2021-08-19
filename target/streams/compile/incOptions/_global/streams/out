@@ -1,0 +1,21 @@
+[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = C:\Users\gaber\Desktop\Revature Items\p2\target\scala-2.11\classes.bak[0m
+[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$typecreator5$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Region2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Entry.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Region.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Region2$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$typecreator13$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$6.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$4.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$5.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$3.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Entry$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$Region$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Project_2$$anonfun$2.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: C:\Users\gaber\Desktop\Revature Items\p2\target\scala-2.11\classes.bak[0m
