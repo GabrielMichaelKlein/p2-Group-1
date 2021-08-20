@@ -1,5 +1,5 @@
 /*************************************************
- *  Gabriel Klein, Grant Muse, Jessie Sabbath
+ *  Gabriel Klein, Grant Muse, Jesse Sabbath
  *  p2
  *  Group 1
  *
@@ -112,7 +112,7 @@ object Project_2 {
 
   def covid_Global_Trends(spark:SparkSession): Unit = {
     /*
-    This method searches through time_series_covid_19_confirmed_US.csv and time_series_covid_19_deaths_USnew.csv,
+    This method searches through time_series_covid_19_confirmed.csv and time_series_covid_19_deaths.csv,
     looks at the cases and deaths of every country, and creates a csv with cleaned up and filtered data which
     can be used by Excel to create graphs to visualize the deaths per infection in different countries.
      */
