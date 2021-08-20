@@ -119,6 +119,7 @@ object Project_2 {
     val casesDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_confirmed.csv")
     val deathsDF =  spark.read.options(Map("inferSchema"->"true", "header"->"true")).csv("input/time_series_covid_19_deaths.csv")
 
+    //Construct cases and death DFs, grouping by country
     val deathsQuarterlyUngroupedDF = deathsDF.select(col("Country/Region"),col("2/2/20").as("D 2/20"), col("5/2/20").as("D 5/20"),col("8/2/20").as("D 8/20"), col("11/2/20").as("D 11/20"), col("2/20/21").as("D 2/21"),col("5/2/21").as("D 5/21"))
     val deathsByCountryDF = deathsQuarterlyUngroupedDF
       .groupBy("Country/Region")//.sum("D 5/21")
@@ -133,19 +134,23 @@ object Project_2 {
 
     casesByCountryDF = casesByCountryDF.withColumnRenamed("Country/Region", "Country")
 
+    //Join cases and deaths DFs
     val joinedData =  deathsByCountryDF
       .join(casesByCountryDF, deathsByCountryDF("Country/Region") === casesByCountryDF("Country"))
       .drop("Country/Region")
       .persist
 
+    //Calculate and sort by death/case ratio
     val deathCaseRatio = joinedData
       .select("Country", "sum(C 5/21)", "sum(D 5/21)")
       .withColumn("Death_Case_Ratio", round(col("sum(D 5/21)")/col("sum(C 5/21)") * 100, 2))
       .orderBy(col("Death_Case_Ratio").desc)
 
+    //Rename column to prevent issues with / in query
     val renamed = joinedData.withColumnRenamed("sum(D 5/21)", "Deaths_May2021").withColumnRenamed("sum(C 5/21)", "Cases_May2021")
     renamed.createOrReplaceTempView("joined_Data")
 
+    //Create new row with global death/case ratio and add it to the ratio df via union
     val globalRatioDF = spark.sql("Select sum(Cases_May2021) as Cases_May2021, sum(Deaths_May2021) as Deaths_May2021, round(sum(Deaths_May2021)/sum(Cases_May2021), 2) * 100 as Death_Case_Ratio from joined_Data")
     val withCountry = globalRatioDF.withColumn("Country", lit("Global"))
 
@@ -170,7 +175,6 @@ object Project_2 {
     //Compile to one visualizationDF for .csv export
     val tempRatioDF = deathCaseRatioFinalDF.withColumnRenamed("Country","C2")
     val visualizationDF = joinedData.join(tempRatioDF.select("C2","Death_Case_Ratio"), tempRatioDF("C2") === joinedData("Country")).drop("C2")
-    //visualizationDF.show
 
     try {
       visualizationDF.coalesce(1).write
