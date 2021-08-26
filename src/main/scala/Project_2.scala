@@ -22,13 +22,13 @@ object Project_2 {
   case class Region(UID : String, iso2 : String, iso3 : String, code3 : String, FIPS : String, Admin2 : String, Province : String, Country_Region : String, Lat : String, Long_ : String, total : Int)
   case class Region2(UID : String, iso2 : String, iso3 : String, code3 : String, FIPS : String, Admin2 : String, Province : String, Country_Region : String, Lat : String, Long_ : String, Population : Int, Deaths : Int)
 
-  def grantsPart(spark:SparkSession): Unit ={
+  def caseAndDeathTrendsUS(spark:SparkSession): Unit ={
     /*
     This method searches through time_series_covid_19_confirmed_US.csv and time_series_covid_19_deaths_USnew.csv,
     relates the cases and deaths due to covid to the population of each state, and creates a new csv file
     which can be imported into excel to create a bar chart showing the trends from each state.
      */
-    println("Running Grant's Part")
+    println("Running caseAndDeathTrendsUS")
     import spark.implicits._
     println("generating dataframes")
     val rddFromFile = spark.sparkContext.textFile("input/time_series_covid_19_confirmed_US.csv")
@@ -201,7 +201,7 @@ object Project_2 {
       .enableHiveSupport()
       .getOrCreate()
     spark.sparkContext.setLogLevel("WARN")
-    grantsPart(spark)
+    caseAndDeathTrendsUS(spark)
     covid_US_Trends(spark)
     covid_Global_Trends(spark)
   }
