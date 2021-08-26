@@ -20,4 +20,4 @@ The purpose of this project is to make use of Scala, Spark, and Hadoop in order 
 * **Trend 3: Comparing cases and deaths globally**
 ## Usage
 * Save the Johns Hopkins input data to an input folder within the project's root folder
-* To show max and min calculations for Trend 1 uncomment 'Extra queries' under the grantsPart method
+* To show max and min calculations for Trend 1 uncomment 'Extra queries' under the caseAndDeathTrendsUS method
