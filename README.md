@@ -20,7 +20,10 @@ The purpose of this project is to make use of Scala, Spark, and Hadoop in order 
   * Queries the covid_19_data to group covid cases/deaths with their respective state and date measured
   * Plots the case total per state as it grows over time
   * Plots the death total per state as it grows over time
-* **Trend 3: Comparing cases and deaths globally**
+* **Trend 3: Comparing cases and deaths globally** 
+  * Queries the Covid-19 data to group Covid-19 by country 
+  * Plots the deaths for each country over time in quarterly updates begining in February of 2020.
+  * Plots most recent case/death ratio as of May 2021
 ## Usage
 * Save the Johns Hopkins input data to an input folder within the project's root folder
 * To show max and min calculations for Trend 1 uncomment 'Extra queries' under the caseAndDeathTrendsUS method
